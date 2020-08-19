@@ -1,12 +1,36 @@
-import React from 'react';
-import './App.css';
+import React, { Component } from "react";
+import axios from "axios";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      
-    </div>
-  );
+class App extends Component {
+    constructor() {
+        super();
+        this.state = {
+            countries_data: []
+        }
+    }
+    
+	componentDidMount() {
+		this.fetchCountryData();
+    }
+    
+	fetchCountryData = async () => {
+        axios.get("https://corona-api.com/countries")
+        .then(res => {
+            this.setState({ countries_data: res.data.data })
+        })
+        .catch(err => {
+            console.log(err);
+        })
+    };
+
+	render() {
+        return (
+            <div className="App">
+
+            </div>
+        )
+	}
 }
 
 export default App;
