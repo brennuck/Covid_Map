@@ -1,10 +1,12 @@
 import React from "react";
-import ReactMapGL from "react-map-gl";
+import ReactMapGL, { Marker, NavigationControl } from "react-map-gl";
 
 class Map extends React.Component {
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
+            map_data: [],
+            tooltip: null,
             viewport: {
                 width: "100%",
                 height: 800 ,
