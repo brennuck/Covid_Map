@@ -29,8 +29,9 @@ class App extends Component {
 		axios
 			.get("https://corona-api.com/countries")
 			.then((res) => {
-				const countries_data = this.processData(res.data.data);
-				this.setState({ countries_data });
+                const countries_data2 = this.processData(res.data.data);
+                // console.log("COUTJ:LKJSD:FKJSDF", countries_data2)
+				this.setState({ countries_data: countries_data2 });
 			})
 			.catch((err) => {
 				console.log(err);
@@ -38,7 +39,7 @@ class App extends Component {
 	};
 
 	processData = (data) => {
-		let processed = [];
+        let processed = [];
 
 		for (const d of data) {
 			let obj = {
@@ -80,6 +81,7 @@ class App extends Component {
 	};
 
 	render() {
+        console.log(this.state.countries_data)
 		return (
 			<div className="App">
 				<Legend
@@ -88,7 +90,12 @@ class App extends Component {
 					query={this.state.query}
 					handleSelectLegend={this.handleSetQuery}
 				/>
-                <Map />
+                <Map
+                    colors={this.state.colors}
+                    fields={this.state.fields}
+                    query={this.state.query}
+                    data={this.state.countries_data}
+                />
 			</div>
 		);
 	}
