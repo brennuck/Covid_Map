@@ -23,7 +23,8 @@ class App extends Component {
 		axios
 			.get("https://corona-api.com/countries")
 			.then((res) => {
-				this.setState({ countries_data: res.data.data });
+                const countries_data = this.processData(res.data.data);
+				this.setState({ countries_data });
 			})
 			.catch((err) => {
 				console.log(err);
