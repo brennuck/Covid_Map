@@ -4,6 +4,7 @@ import "./App.css";
 
 import Map from "./Components/Map.js";
 import { coordinates } from "./Patch/CountryCordinates.js";
+import Legend from "./Components/Legend.js";
 
 class App extends Component {
 	constructor() {
@@ -12,6 +13,11 @@ class App extends Component {
 			countries_data: [],
 			fields: ["confirmed", "deaths", "recovered"],
 			query: "confirmed",
+			colors: [
+				"rgba(5, 155, 247, 0.7)",
+				"rgba(233,30,99,0.7)",
+				"rgba(53,211,156,0.7)",
+			],
 		};
 	}
 
@@ -23,7 +29,7 @@ class App extends Component {
 		axios
 			.get("https://corona-api.com/countries")
 			.then((res) => {
-                const countries_data = this.processData(res.data.data);
+				const countries_data = this.processData(res.data.data);
 				this.setState({ countries_data });
 			})
 			.catch((err) => {
@@ -76,7 +82,13 @@ class App extends Component {
 	render() {
 		return (
 			<div className="App">
-				<Map />
+				<Legend
+					colors={this.state.colors}
+					fields={this.state.fields}
+					query={this.state.query}
+					handleSelectLegend={this.handleSetQuery}
+				/>
+                <Map />
 			</div>
 		);
 	}
