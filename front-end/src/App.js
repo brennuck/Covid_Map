@@ -1,104 +1,110 @@
 import React, { Component } from "react";
 import axios from "axios";
-import "./App.css";
 
-import Map from "./Components/Map.js";
 import { coordinates } from "./Patch/CountryCordinates.js";
 import Legend from "./Components/Legend.js";
+import Map from "./Components/Map.js";
 
+import "./App.css";
+
+const initialState = {
+  colors: [
+    "rgb(255, 163, 102, 0.7)",
+    "rgb(255, 0, 0, 0.7)",
+    "rgba(53,211,156,0.7)"
+  ],
+  countries_data: [],
+  data_loaded: false,
+  fields: ["confirmed", "deaths", "recovered"],
+  query: "confirmed"
+};
 class App extends Component {
-	constructor() {
-		super();
-		this.state = {
-			countries_data: [],
-			fields: ["confirmed", "deaths", "recovered"],
-			query: "confirmed",
-			colors: [
-				"rgba(5, 155, 247, 0.7)",
-				"rgba(233,30,99,0.7)",
-				"rgba(53,211,156,0.7)",
-			],
-		};
-	}
+  state = initialState;
 
-	componentDidMount() {
-		this.fetchCountryData();
-	}
+  componentDidMount() {
+    this.fetchCountryData();
+  }
 
-	fetchCountryData = async () => {
-		axios
-			.get("https://corona-api.com/countries")
-			.then((res) => {
-                const countries_data2 = this.processData(res.data.data);
-                // console.log("COUTJ:LKJSD:FKJSDF", countries_data2)
-				this.setState({ countries_data: countries_data2 });
-			})
-			.catch((err) => {
-				console.log(err);
-			});
-	};
+  fetchCountryData = async () => {
+    try {
+      const response = await axios({
+        method: "get",
+        url: "https://corona-api.com/countries"
+      });
 
-	processData = (data) => {
-        let processed = [];
+      // console.table(response.data.data);
+      const countries_data = this.processData(response.data.data);
 
-		for (const d of data) {
-			let obj = {
-				name: d.name,
-				code: d.code,
-				flag: `https://cdn.staticaly.com/gh/hjnilsson/country-flags/master/svg/${d.code.toLowerCase()}.svg`,
-				updated_at: d.updated_at,
-				confirmed: d.latest_data.confirmed,
-				deaths: d.latest_data.deaths,
-				recovered: d.latest_data.recovered,
-			};
+      this.setState({
+        countries_data,
+        data_loaded: true
+      });
+    } catch (e) {
+      console.log("unable to retrieve data", e);
+    }
+  };
 
-			// Patch for countries' coordinates
-			obj["coordinates"] = {
-				latitude:
-					coordinates.find((f) => f.country_code === d.code) !==
-					undefined
-						? coordinates.find((f) => f.country_code === d.code)
-								.latlng[0]
-						: 0,
-				longitude:
-					coordinates.find((f) => f.country_code === d.code) !==
-					undefined
-						? coordinates.find((f) => f.country_code === d.code)
-								.latlng[1]
-						: 0,
-			};
+  processData = data => {
+    let processed = [];
 
-			processed.push(obj);
-		}
+    for (const d of data) {
+      let obj = {
+        name: d.name,
+        code: d.code,
+        flag: `https://cdn.staticaly.com/gh/hjnilsson/country-flags/master/svg/${d.code.toLowerCase()}.svg`,
+        updated_at: d.updated_at,
+        confirmed: d.latest_data.confirmed,
+        deaths: d.latest_data.deaths,
+        recovered: d.latest_data.recovered
+      };
 
-		return processed;
-	};
+      // Patch for countries' coordinates
+      obj["coordinates"] = {
+        latitude:
+          coordinates.find(f => f.country_code === d.code) !== undefined
+            ? coordinates.find(f => f.country_code === d.code).latlng[0]
+            : 0,
+        longitude:
+          coordinates.find(f => f.country_code === d.code) !== undefined
+            ? coordinates.find(f => f.country_code === d.code).latlng[1]
+            : 0
+      };
 
-	handleSetQuery = (query) => {
-		this.setState({
-			query,
-		});
-	};
+      processed.push(obj);
+    }
 
-	render() {
-        console.log(this.state.countries_data)
-		return (
-			<div className="App">
-				<Legend
-					colors={this.state.colors}
-					fields={this.state.fields}
-					query={this.state.query}
-					handleSelectLegend={this.handleSetQuery}
-				/>
-                <Map
-                    colors={this.state.colors}
-                    fields={this.state.fields}
-                    query={this.state.query}
-                    data={this.state.countries_data}
-                />
-			</div>
-		);
-	}
+    return processed;
+  };
+
+  handleSetQuery = query => {
+    this.setState({
+      query
+    });
+  };
+
+  render() {
+    const { colors, countries_data, data_loaded, fields, query } = this.state;
+
+    return data_loaded ? (
+      <div className="root">
+        <Legend
+          colors={colors}
+          fields={fields}
+          query={query}
+          handleSelectLegend={this.handleSetQuery}
+        />
+
+        <Map
+          colors={colors}
+          data={countries_data}
+          fields={fields}
+          query={query}
+        />
+
+        <div className="footer">Data source: About-Corona.Net</div>
+      </div>
+    ) : null;
+  }
 }
 
 export default App;

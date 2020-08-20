@@ -1,3 +1,7 @@
+html, body {
+    overflow: hidden;
+}
+
 .root {
     align-items: center;
     display: flex;
@@ -5,7 +9,7 @@
     justify-content: center;
 }
 .map-marker {
-    border-radius: 50%;
+    border-radius: 100%;
     cursor: pointer;
 }
 .map-nav {
