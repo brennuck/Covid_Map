@@ -11,6 +11,8 @@ html, body {
 .map-marker {
     border-radius: 100%;
     cursor: pointer;
+    height: 15px;
+    width: 15px;
 }
 .map-nav {
     bottom: 32px;
